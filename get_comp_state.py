@@ -15,29 +15,38 @@
 import psutil
 import serial
 
-val_size = 3
+VAL_SIZE = 3
 values = [ 0, 0, 0]
 
 bytes_sent_buf = psutil.net_io_counters().bytes_sent
 bytes_recv_buf = psutil.net_io_counters().bytes_recv
 
-dev_name = "/dev/cu.usbmodem1421"
-ser = serial.Serial( dev_name, 9600, timeout=0.1)
+DEV_NAME = "/dev/cu.usbmodem1421"
+ser = serial.Serial( DEV_NAME, 9600, timeout=0.1)
+
+ARDUINO_ANALOG_WRITE_MAX = 1023
+CPU_MAX = 100
+MEM_MAX = 100
+PACKET_MAX = 1000
 
 def main():
     while True:
         # PC情報の収集
         getCompState()
+        value2ArduinoDisp()
         sendArduino()
 
         print(values)
         # time.sleep(0.2)   # cpu使用率取得のインターバルで0.2秒止めているのでコメントアウト
 
 
+def value2ArduinoDisp():
+    pass
+
 # Arduinoへ変数valuesをシリアル通信で送信する
 def sendArduino():
 
-    for i in range(val_size):
+    for i in range(VAL_SIZE):
         head = 128+i
         high = (values[i] >> 7) & 127
         low  = values[i] & 127
