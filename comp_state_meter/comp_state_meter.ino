@@ -3,9 +3,9 @@
  * https://qiita.com/keitasumiya/items/25a707c37a73bfd95bac
  */
 
-#define CPU_PIN 0
-#define MEM_PIN 0
-#define PAK_PIN 0
+#define CPU_PIN 3
+#define MEM_PIN 5
+#define PAK_PIN 9
 
 const int val_size = 3;
 int values[val_size] = {0, 0, 0};
@@ -15,17 +15,13 @@ void setup(){
   pinMode( CPU_PIN, OUTPUT);
   pinMode( MEM_PIN, OUTPUT);
   pinMode( PAK_PIN, OUTPUT);
-  analogWrite( CPU_PIN, 0);
-  analogWrite( MEM_PIN, 0);
-  analogWrite( PAK_PIN, 0);
+  analogWrite( CPU_PIN, 255);
+  analogWrite( MEM_PIN, 255);
+  analogWrite( PAK_PIN, 255);
   Serial.begin(9600);
 }
 
 void loop(){
-
-  analogWrite( CPU_PIN, values[0]);
-  analogWrite( MEM_PIN, values[1]);
-  analogWrite( PAK_PIN, values[2]);
   
   if (Serial.available() >= 3*val_size+1) {
     int head = Serial.read();
@@ -53,4 +49,8 @@ void loop(){
       }
     }
   }
+
+  analogWrite( CPU_PIN, values[0]);
+  analogWrite( MEM_PIN, values[1]);
+  analogWrite( PAK_PIN, values[2]);
 }
