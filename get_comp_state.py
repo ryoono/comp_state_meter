@@ -12,6 +12,9 @@
 # Arduinoへの送信
 # https://qiita.com/keitasumiya/items/25a707c37a73bfd95bac
 
+# シリアルポートの調べ方
+# $ ls -l /dev/tty.*
+
 import psutil
 import serial
 
@@ -21,10 +24,10 @@ values = [ 0, 0, 0]
 bytes_sent_buf = psutil.net_io_counters().bytes_sent
 bytes_recv_buf = psutil.net_io_counters().bytes_recv
 
-DEV_NAME = "/dev/cu.usbmodem1421"
+DEV_NAME = "/dev/tty.usbserial-1410"
 ser = serial.Serial( DEV_NAME, 9600, timeout=0.1)
 
-ARDUINO_ANALOG_WRITE_MAX = 1023
+ARDUINO_ANALOG_WRITE_MAX = 255
 CPU_MAX = 100
 MEM_MAX = 100
 PACKET_MAX = 1000
@@ -41,7 +44,23 @@ def main():
 
 
 def value2ArduinoDisp():
-    pass
+    # CPU 比例 0~100
+    values[0] = int(values[0] * (255/100))
+
+    # MEM 0~40% → 0~20, 40~100 → 20~100
+    if values[1] < 40:
+        values[1] = int( values[1] * 1.275 )
+    else:
+        values[1] = int( 51 + ((values[1] - 40 ) * 3.4) )
+    
+    # 比例 100Mbps → 255
+    values[2] = int(values[2] * (255/100000000))
+
+    for i in range(3):
+        if values[i] < 0:
+            values[i] = 0
+        if values[i] > 255:
+            values[i] = 255
 
 # Arduinoへ変数valuesをシリアル通信で送信する
 def sendArduino():
